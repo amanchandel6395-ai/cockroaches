@@ -8,7 +8,7 @@ export function CustomizePanel({
   custom: string; setCustom: (s: string) => void;
   scope: Scope; setScope: (s: Scope) => void;
   bg: BgChoice; setBg: (b: BgChoice) => void;
-  disabled?: boolean;
+  disabled?: boolean | undefined;
 }) {
   return (
     <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
@@ -41,7 +41,7 @@ export function CustomizePanel({
   );
 }
 
-export function BackgroundPicker({ bg, setBg, disabled }: { bg: BgChoice; setBg: (b: BgChoice) => void; disabled?: boolean }) {
+export function BackgroundPicker({ bg, setBg, disabled }: { bg: BgChoice; setBg: (b: BgChoice) => void; disabled?: boolean | undefined }) {
   return (
     <>
       <label className="text-xs font-semibold uppercase text-muted-foreground">Change background (optional)</label>
