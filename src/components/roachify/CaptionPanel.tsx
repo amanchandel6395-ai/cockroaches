@@ -47,7 +47,7 @@ export function CaptionPanel({ context, caption, setCaption, trigger }: {
           <option value="hinglish">Hinglish</option><option value="hindi">Hindi</option><option value="english">English</option>
         </select>
         <select aria-label="Tone" value={tone} onChange={(e) => setTone(e.target.value as Tone)} className={sel}>
-          {["funny", "savage", "meme", "horror", "dramatic"].map((t) => <option key={t} value={t}>{t[0].toUpperCase() + t.slice(1)}</option>)}
+          {["funny", "savage", "meme", "horror", "dramatic"].map((t) => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
         </select>
         <label className="flex items-center gap-1 text-sm"><input type="checkbox" checked={tags} onChange={(e) => setTags(e.target.checked)} className="accent-primary" /> Hashtags</label>
       </div>
