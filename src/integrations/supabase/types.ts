@@ -104,6 +104,10 @@ export type Database = {
     }
     Functions: {
       consume_quota: { Args: { _kind: string; _user: string }; Returns: string }
+      grant_purchase: {
+        Args: { _order: string; _payment: string }
+        Returns: undefined
+      }
       refund_quota: {
         Args: { _source: string; _user: string }
         Returns: undefined
