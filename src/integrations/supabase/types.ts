@@ -14,13 +14,100 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      entitlements: {
+        Row: {
+          download_credits: number
+          image_credits: number
+          plan: string | null
+          plan_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          download_credits?: number
+          image_credits?: number
+          plan?: string | null
+          plan_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          download_credits?: number
+          image_credits?: number
+          plan?: string | null
+          plan_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount_inr: number
+          created_at: string
+          id: string
+          product: string
+          provider_order_id: string | null
+          provider_payment_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_inr: number
+          created_at?: string
+          id?: string
+          product: string
+          provider_order_id?: string | null
+          provider_payment_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_inr?: number
+          created_at?: string
+          id?: string
+          product?: string
+          provider_order_id?: string | null
+          provider_payment_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      usage_log: {
+        Row: {
+          created_at: string
+          id: number
+          kind: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          kind: string
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          kind?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_quota: { Args: { _kind: string; _user: string }; Returns: string }
+      refund_quota: {
+        Args: { _source: string; _user: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
