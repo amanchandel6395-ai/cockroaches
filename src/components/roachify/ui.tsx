@@ -59,7 +59,7 @@ export function CameraSwitcher({ facing, onChange }: { facing: Facing; onChange:
 
 export function StylePicker({ value, onChange, disabled }: { value: RoachStyle; onChange: (s: RoachStyle) => void; disabled?: boolean }) {
   return (
-    <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Cockroach style">
+    <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Cockroach style">
       {STYLES.map((s) => (
         <button
           key={s.id}
@@ -67,7 +67,7 @@ export function StylePicker({ value, onChange, disabled }: { value: RoachStyle; 
           aria-checked={value === s.id}
           disabled={disabled}
           onClick={() => onChange(s.id)}
-          className={`rounded-xl border px-3 py-2 text-sm font-semibold transition ${value === s.id ? "border-primary bg-accent text-accent-foreground" : "border-border text-muted-foreground"}`}
+          className={`flex-1 whitespace-nowrap rounded-xl border px-3 py-2 text-sm font-semibold transition ${value === s.id ? "border-primary bg-accent text-accent-foreground" : "border-border text-muted-foreground"}`}
         >
           {s.label}
         </button>

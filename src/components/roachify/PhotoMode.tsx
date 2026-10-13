@@ -37,6 +37,16 @@ async function composeWithCaption(src: string, caption: string) {
       ctx.fillStyle = "white"; ctx.fillText(l, c.width / 2, y);
     });
   }
+  // Watermark (removed once paid downloads are connected)
+  const ws = Math.round(c.width / 22);
+  ctx.save();
+  ctx.font = `${ws}px Anton, Impact, sans-serif`;
+  ctx.fillStyle = "rgba(255,255,255,0.28)";
+  ctx.textAlign = "center";
+  ctx.translate(c.width / 2, c.height / 2);
+  ctx.rotate(-Math.PI / 6);
+  for (let y = -c.height; y < c.height; y += ws * 4) for (let x = -c.width; x < c.width; x += ws * 9) ctx.fillText("ROACHIFY", x, y);
+  ctx.restore();
   return new Promise<Blob>((r) => c.toBlob((b) => r(b!), "image/png"));
 }
 
@@ -117,7 +127,7 @@ export function PhotoMode() {
     setPhoto(null); setPhotoUrl(null); setHistory([]); setStatus("idle"); setError(null); setCaption("");
   };
 
-  const finalBlob = async () => (burn && caption.trim() ? composeWithCaption(result!, caption) : dataUrlToBlob(result!));
+  const finalBlob = async () => composeWithCaption(result!, burn ? caption : "");
   const download = async () => {
     if (!result) return;
     const url = URL.createObjectURL(await finalBlob());
@@ -139,11 +149,16 @@ export function PhotoMode() {
     <div className="flex flex-col gap-4">
       <Frame>
         {showing ? (
-          <img src={showing} alt={result ? "Your cockroach transformation" : "Your photo"}
+          <img src={showing} draggable={false} onContextMenu={(e) => e.preventDefault()} alt={result ? "Your cockroach transformation" : "Your photo"}
             className={`h-full w-full object-cover transition-[filter] duration-700 ${preview && !isFinal ? "blur-2xl" : "blur-0"}`} />
         ) : (
           <video ref={cam.videoRef} playsInline muted
             className={`h-full w-full object-cover ${cam.facing === "user" ? "-scale-x-100" : ""} ${cam.active ? "" : "hidden"}`} />
+        )}
+        {result && !preview && (
+          <div aria-hidden className="pointer-events-none absolute inset-0 flex select-none items-center justify-center">
+            <span className="-rotate-[30deg] font-display text-6xl uppercase opacity-25">Roachify</span>
+          </div>
         )}
         {result && !preview && burn && caption.trim() && (
           <p className="pointer-events-none absolute inset-x-4 bottom-6 text-center font-display text-2xl uppercase [-webkit-text-stroke:1px_black] [paint-order:stroke] drop-shadow-lg">{caption}</p>
