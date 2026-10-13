@@ -16,7 +16,7 @@ function loadRazorpay() {
   });
 }
 
-export function PlanCard({ product, highlight, onPaid }: { product: Product; highlight?: boolean; onPaid?: () => void }) {
+export function PlanCard({ product, highlight, onPaid }: { product: Product; highlight?: boolean; onPaid?: (() => void) | undefined }) {
   const p = PRODUCTS[product];
   const order = useServerFn(createOrder);
   const [msg, setMsg] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export function PlanCard({ product, highlight, onPaid }: { product: Product; hig
   );
 }
 
-export function Paywall({ text, product, onClose, onPaid }: { text: string; product: Product; onClose: () => void; onPaid?: () => void }) {
+export function Paywall({ text, product, onClose, onPaid }: { text: string; product: Product; onClose: () => void; onPaid?: (() => void) | undefined }) {
   return (
     <div role="dialog" aria-modal className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 p-4 backdrop-blur sm:items-center">
       <div className="relative flex w-full max-w-sm flex-col gap-3">

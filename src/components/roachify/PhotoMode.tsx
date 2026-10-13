@@ -5,6 +5,7 @@ import { CameraSwitcher, Frame, StylePicker, BigButton, Pill } from "./ui";
 import { CustomizePanel, BackgroundPicker, type BgChoice } from "./CustomizePanel";
 import { CaptionPanel } from "./CaptionPanel";
 import { streamImage } from "@/lib/stream-image";
+import { supabase } from "@/integrations/supabase/client";
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES, summarize, type RoachStyle, type Scope } from "@/lib/roach-prompts";
 
 type Status = "idle" | "processing" | "done" | "error";
@@ -106,13 +107,15 @@ export function PhotoMode() {
     form.append("background", opts.background);
     let last: string | null = null;
     try {
-      await streamImage("/api/roachify", form, (src, final) => { setPreview(src); setIsFinal(final); if (final) last = src; });
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) { window.location.href = "/auth"; return; }
+      await streamImage("/api/roachify", form, (src, final) => { setPreview(src); setIsFinal(final); if (final) last = src; }, undefined, { Authorization: `Bearer ${sess.session.access_token}` });
       if (last) setHistory((h) => [...h, last!]);
       setPreview(null); setStatus("done"); setCaptionTick((t) => t + 1);
     } catch (e) {
       setPreview(null); setStatus(history.length ? "done" : "error");
       const msg = e instanceof Error ? e.message : "";
-      setError(msg.includes("402") ? "AI credits have run out. Please top up to keep roachifying."
+      setError(msg.includes("401") ? "Please sign in to continue." : msg.includes("quota") ? "Your free image is used up — get 10 more for ₹9 on the Plans page." : msg.includes("402") ? "AI credits have run out. Please top up to keep roachifying."
         : msg.includes("429") ? "Too many requests right now. Wait a moment and retry."
         : msg.includes("400") ? (msg.split(" 400 ")[1] || "That request wasn't accepted.")
         : "The transformation failed. Please try again.");
