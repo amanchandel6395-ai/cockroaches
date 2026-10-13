@@ -1,10 +1,12 @@
-export type RoachStyle = "realistic" | "funny" | "horror";
+export type RoachStyle = "realistic" | "funny" | "horror" | "cute" | "ghost";
 export type Scope = "face" | "character" | "clothes" | "background" | "face_bg" | "full";
 
 export const STYLES: { id: RoachStyle; label: string }[] = [
   { id: "realistic", label: "Realistic" },
   { id: "funny", label: "Funny" },
   { id: "horror", label: "Horror" },
+  { id: "cute", label: "Cute 🥺" },
+  { id: "ghost", label: "Ghost 👻" },
 ];
 
 export const SCOPES: { id: Scope; label: string }[] = [
@@ -22,6 +24,11 @@ export const CHIPS: { label: string; prompt: string }[] = [
   { label: "Horror Monster", prompt: "Turn me into a horror cockroach creature with glowing red eyes and dripping mandibles." },
   { label: "Bollywood Villain", prompt: "Turn me into a dramatic Bollywood villain cockroach with a thick moustache and gold chains." },
   { label: "Giant Cockroach", prompt: "Give me a giant cockroach head and a tiny human body." },
+  { label: "Sigma Roach 😎", prompt: "Make me a sigma cockroach with dark sunglasses, a gold chain and a cold confident stare." },
+  { label: "Anime Roach", prompt: "Give the cockroach face anime-style huge glossy eyes and dramatic anime lighting while staying realistic." },
+  { label: "Rizz King", prompt: "Make me a charming rizz-king cockroach winking with a smirk and a stylish hairdo." },
+  { label: "NPC Mode", prompt: "Make me a blank-stare NPC cockroach with a confused glitchy video-game vibe." },
+  { label: "Gym Bro", prompt: "Give me a muscular gym-bro cockroach look flexing, with a sweatband." },
   { label: "Custom Background", prompt: "Put me on a giant throne in a dark red palace with dramatic cinematic lighting." },
 ];
 
@@ -45,6 +52,8 @@ const FACE =
 const STYLE_EXTRA: Record<RoachStyle, string> = {
   realistic: " Cinematic, highly detailed, natural expression.",
   funny: " Make it expressive and humorous, with a goofy grin and playful eyes, while staying photorealistic.",
+  cute: " Make it an adorable, cute cockroach: big shiny sparkly eyes, soft rounded features, tiny curled antennae, a sweet blush and a happy smile, kawaii but still photoreal.",
+  ghost: " Make it a ghostly spectral cockroach: pale glowing translucent chitin, misty wisps, eerie blue-white glow around the head, haunted vibe.",
   horror: " Make it darker, creepy and dramatic: wet glistening chitin, menacing mandibles, moody shadows.",
 };
 
