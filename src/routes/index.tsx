@@ -20,9 +20,18 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [mode, setMode] = useState<"photo" | "video">("photo");
+  const { user } = useAuth();
   return (
     <main className="min-h-screen bg-stage px-4 pb-10 pt-6">
       <div className="mx-auto flex max-w-md flex-col gap-5">
+        <nav className="flex justify-between text-sm font-semibold">
+          <Link to="/plans" className="rounded-full border border-primary px-3 py-1">💎 Plans</Link>
+          {user ? (
+            <button onClick={() => supabase.auth.signOut()} className="text-muted-foreground">Sign out</button>
+          ) : (
+            <Link to="/auth" className="rounded-full bg-secondary px-3 py-1">Sign in</Link>
+          )}
+        </nav>
         <h1 className="flex items-center justify-center gap-1 font-display text-6xl uppercase text-roach">
           Ro<Bug className="h-12 w-12 text-primary" aria-hidden />achify
         </h1>
