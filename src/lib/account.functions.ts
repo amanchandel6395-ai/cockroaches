@@ -28,10 +28,10 @@ export const useDownloadCredit = createServerFn({ method: "POST" })
   });
 
 // Payment gateway (Razorpay) — needs RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET from the owner.
+// Public: guests pay first, then sign up and claim the order.
 export const createOrder = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ product: z.enum(["image_pack", "download", "video_plan", "combo_plan"]) }).parse(d))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     const keyId = process.env["RAZORPAY_KEY_ID"];
     const secret = process.env["RAZORPAY_KEY_SECRET"];
     if (!keyId || !secret) return { error: "Payments are being set up. Please check back soon!" as string, order: null };
@@ -39,11 +39,20 @@ export const createOrder = createServerFn({ method: "POST" })
     const res = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
       headers: { Authorization: "Basic " + btoa(`${keyId}:${secret}`), "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: p.price * 100, currency: "INR", notes: { user_id: context.userId, product: data.product } }),
+      body: JSON.stringify({ amount: p.price * 100, currency: "INR", notes: { product: data.product } }),
     });
     if (!res.ok) return { error: "Couldn't start payment. Please try again.", order: null };
     const order = (await res.json()) as { id: string };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("payments").insert({ user_id: context.userId, product: data.product, amount_inr: p.price, provider_order_id: order.id });
+    await supabaseAdmin.from("payments").insert({ user_id: null, product: data.product, amount_inr: p.price, provider_order_id: order.id });
     return { error: null, order: { id: order.id, keyId, amount: p.price * 100, name: p.name } };
+  });
+
+export const claimOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ orderId: z.string().min(5).max(64) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: r } = await supabaseAdmin.rpc("claim_payment", { _order: data.orderId, _user: context.userId });
+    return { status: String(r) };
   });

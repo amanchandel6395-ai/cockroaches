@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { ClaimPending } from "@/components/roachify/ClaimPending";
 import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -35,6 +36,7 @@ function Index() {
             <Link to="/auth" className="rounded-full bg-secondary px-3 py-1">Sign in</Link>
           )}
         </nav>
+        <ClaimPending />
         <h1 className="flex items-center justify-center gap-1 font-display text-6xl uppercase text-roach">
           Ro<Bug className="h-12 w-12 text-primary" aria-hidden />achify
         </h1>
