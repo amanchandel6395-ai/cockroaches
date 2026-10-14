@@ -50,7 +50,7 @@ export type Database = {
           provider_order_id: string | null
           provider_payment_id: string | null
           status: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           amount_inr: number
@@ -60,7 +60,7 @@ export type Database = {
           provider_order_id?: string | null
           provider_payment_id?: string | null
           status?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           amount_inr?: number
@@ -70,7 +70,7 @@ export type Database = {
           provider_order_id?: string | null
           provider_payment_id?: string | null
           status?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -103,6 +103,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_grant: {
+        Args: { _product: string; _user: string }
+        Returns: undefined
+      }
+      claim_payment: {
+        Args: { _order: string; _user: string }
+        Returns: string
+      }
       consume_quota: { Args: { _kind: string; _user: string }; Returns: string }
       grant_purchase: {
         Args: { _order: string; _payment: string }
