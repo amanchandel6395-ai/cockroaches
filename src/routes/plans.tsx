@@ -21,7 +21,6 @@ function Plans() {
         <h1 className="text-center font-display text-5xl uppercase text-roach">Plans</h1>
         <p className="text-center text-sm text-muted-foreground">Your first cockroach image is free 🪳</p>
         <PlanCard product="image_pack" />
-        <PlanCard product="download" />
         <PlanCard product="video_plan" />
         <PlanCard product="combo_plan" highlight />
       </div>

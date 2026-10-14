@@ -30,9 +30,9 @@ export function PlanCard({ product, highlight, onPaid }: { product: Product; hig
       new window.Razorpay({
         key: r.order.keyId, order_id: r.order.id, amount: r.order.amount, currency: "INR",
         name: "ROACHIFY", description: r.order.name, theme: { color: "#e11d2e" },
-        handler: () => { setMsg("Payment received! Updating your account…"); setTimeout(() => onPaid?.(), 2500); },
+        handler: () => { localStorage.setItem("roachify_pending_order", r.order!.id); setMsg("Payment received! Ab account banaiye…"); onPaid ? setTimeout(() => onPaid(), 1500) : (window.location.href = "/auth?paid=1"); },
       }).open();
-    } catch { setMsg("Please sign in first."); } finally { setBusy(false); }
+    } catch { setMsg("Couldn't start payment. Please try again."); } finally { setBusy(false); }
   };
   return (
     <div className={`flex flex-col gap-3 rounded-2xl border p-4 ${highlight ? "border-primary bg-accent shadow-glow" : "border-border bg-card"}`}>

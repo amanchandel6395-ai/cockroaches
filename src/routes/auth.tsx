@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
@@ -22,6 +22,8 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [paid, setPaid] = useState(false);
+  useEffect(() => { if (localStorage.getItem("roachify_pending_order")) { setPaid(true); setMode("up"); } }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +49,9 @@ function AuthPage() {
     <main className="flex min-h-screen items-center justify-center bg-stage px-4">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-3xl border border-border bg-card p-6">
         <h1 className="text-center font-display text-4xl uppercase text-roach">Roachify</h1>
+        {paid && (
+          <p className="rounded-xl border border-primary bg-accent p-3 text-center text-sm">✅ Payment ho gaya! Ab account banaiye taaki aapke credits save ho jayein.</p>
+        )}
         <p className="text-center text-sm text-muted-foreground">{mode === "in" ? "Sign in to continue" : "Create your account"}</p>
         <button onClick={google} className="rounded-xl border border-border bg-secondary py-3 font-semibold">Continue with Google</button>
         <form onSubmit={submit} className="flex flex-col gap-3">
