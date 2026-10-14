@@ -1,3 +1,6 @@
+import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Camera, Bug, Video } from "lucide-react";
