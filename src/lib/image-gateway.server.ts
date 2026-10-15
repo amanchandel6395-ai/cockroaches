@@ -14,6 +14,7 @@ export const imageSettings: Omit<ImageConfig, "apiKey"> = {
 export function editImage(config: ImageConfig, form: FormData, signal?: AbortSignal) {
   const streaming = form.get("stream") !== "false";
   form.set("model", config.model);
+  if (!form.has("quality")) form.set("quality", "medium");
   if (streaming) {
     form.set("stream", "true");
     if (!form.has("partial_images")) form.set("partial_images", "1");

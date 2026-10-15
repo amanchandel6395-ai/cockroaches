@@ -6,13 +6,29 @@ import { CustomizePanel, BackgroundPicker, type BgChoice } from "./CustomizePane
 import { CaptionPanel } from "./CaptionPanel";
 import { streamImage } from "@/lib/stream-image";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { useDownloadCredit } from "@/lib/account.functions";
+import { Paywall } from "./Paywall";
+import { DENIAL_TEXT } from "@/lib/plans";
+
+async function shrink(b: Blob, max = 1024): Promise<Blob> {
+  try {
+    const bmp = await createImageBitmap(b);
+    const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    if (k === 1 && b.size < 1_500_000) return b;
+    const c = document.createElement("canvas");
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+    return await new Promise<Blob>((r) => c.toBlob((x) => r(x ?? b), "image/jpeg", 0.9));
+  } catch { return b; }
+}
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES, summarize, type RoachStyle, type Scope } from "@/lib/roach-prompts";
 
 type Status = "idle" | "processing" | "done" | "error";
 
 async function dataUrlToBlob(u: string) { return (await fetch(u)).blob(); }
 
-async function composeWithCaption(src: string, caption: string) {
+async function composeWithCaption(src: string, caption: string, watermark = true) {
   const img = new Image();
   img.src = src;
   await img.decode();
@@ -38,7 +54,7 @@ async function composeWithCaption(src: string, caption: string) {
       ctx.fillStyle = "white"; ctx.fillText(l, c.width / 2, y);
     });
   }
-  // Watermark (removed once paid downloads are connected)
+  if (!watermark) return new Promise<Blob>((r) => c.toBlob((b) => r(b!), "image/png"));
   const ws = Math.round(c.width / 22);
   ctx.save();
   ctx.font = `${ws}px Anton, Impact, sans-serif`;
@@ -70,6 +86,9 @@ export function PhotoMode() {
   const [burn, setBurn] = useState(true);
   const [captionTick, setCaptionTick] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
+  const [paywall, setPaywall] = useState(false);
+  const [dlBusy, setDlBusy] = useState(false);
+  const takeDownload = useServerFn(useDownloadCredit);
 
   const result = history[history.length - 1] ?? null;
 
@@ -100,7 +119,7 @@ export function PhotoMode() {
   const run = async (source: Blob, opts: { scope: Scope; custom: string; background: string }) => {
     setStatus("processing"); setError(null); setPreview(null); setIsFinal(false); setShowSummary(false);
     const form = new FormData();
-    form.append("image", source, source instanceof File ? source.name : "photo.png");
+    form.append("image", await shrink(source), "photo.jpg");
     form.append("style", style);
     form.append("scope", opts.scope);
     form.append("custom", opts.custom);
@@ -130,10 +149,17 @@ export function PhotoMode() {
     setPhoto(null); setPhotoUrl(null); setHistory([]); setStatus("idle"); setError(null); setCaption("");
   };
 
-  const finalBlob = async () => composeWithCaption(result!, burn ? caption : "");
+  const finalBlob = async (watermark = true) => composeWithCaption(result!, burn ? caption : "", watermark);
   const download = async () => {
-    if (!result) return;
-    const url = URL.createObjectURL(await finalBlob());
+    if (!result || dlBusy) return;
+    setDlBusy(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) { window.location.href = "/auth"; return; }
+      const r = await takeDownload();
+      if (!r.ok) { setPaywall(true); return; }
+    } catch { setError("Download failed. Please try again."); return; } finally { setDlBusy(false); }
+    const url = URL.createObjectURL(await finalBlob(false));
     const a = document.createElement("a"); a.href = url; a.download = "roachified.png"; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   };
@@ -195,7 +221,7 @@ export function PhotoMode() {
       {result ? (
         <>
           <div className="grid grid-cols-3 gap-3">
-            <Pill onClick={download} disabled={busy}><Download className="h-4 w-4" /> Download</Pill>
+            <Pill onClick={download} disabled={busy || dlBusy}><Download className="h-4 w-4" /> {dlBusy ? "…" : "Download"}</Pill>
             <Pill onClick={share} disabled={busy}><Share2 className="h-4 w-4" /> Share</Pill>
             <Pill onClick={reset} disabled={busy}><Trash2 className="h-4 w-4" /> Delete</Pill>
             <Pill onClick={() => setHistory((h) => h.slice(0, -1))} disabled={busy}><Undo2 className="h-4 w-4" /> {history.length > 1 ? "Undo" : "Back"}</Pill>
@@ -236,6 +262,7 @@ export function PhotoMode() {
           </div>
         </>
       )}
+      {paywall && <Paywall text="Clean HD download ke liye ₹9 pack lo — 10 images + 10 downloads without watermark!" product="image_pack" onClose={() => setPaywall(false)} />}
       <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ""; }} />
     </div>
   );

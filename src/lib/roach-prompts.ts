@@ -47,7 +47,7 @@ export const BACKGROUNDS: { id: string; label: string; prompt: string }[] = [
 ];
 
 const FACE =
-  "Transform the person's face into a highly photorealistic, anatomically plausible anthropomorphic cockroach face: detailed glossy brown chitin exoskeleton, large dark compound eyes, natural insect mandibles, and two curved antennae, blended seamlessly into the original head, hairline, neck and lighting.";
+  "Transform the person's head into a stunning, Hollywood-VFX-quality anthropomorphic American cockroach head: segmented glossy reddish-brown chitin plates with subtle specular highlights and fine micro-texture, large glossy black compound eyes with visible facets, articulated palps and mandibles where the mouth was, and two long thin segmented antennae sweeping back from the forehead. Keep the person's expression, head angle and hairstyle silhouette so it is clearly still them, and blend seamlessly into the neck, skin tone transition, hairline and the original scene lighting with correct shadows. Sharp focus, rich detail, no blur or artifacts.";
 
 const STYLE_EXTRA: Record<RoachStyle, string> = {
   realistic: " Cinematic, highly detailed, natural expression.",
